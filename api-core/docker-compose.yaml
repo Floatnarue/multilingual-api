@@ -1,0 +1,15 @@
+services:
+  postgresql:
+    image: postgres:15-alpine
+    restart: on-failure
+    environment:
+      POSTGRES_USER: main
+      POSTGRES_PASSWORD: main
+      POSTGRES_DB: main
+    ports:
+      - 5434:5432
+    volumes:
+      - database-storage:/var/lib/postgresql/data
+
+volumes:
+  database-storage:
