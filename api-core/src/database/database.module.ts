@@ -11,7 +11,6 @@ export class DatabaseModule {
             module: DatabaseModule,
             providers: [
                 DatabaseService,
-
             ],
             exports: [DatabaseService],
         }
