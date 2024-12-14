@@ -18,3 +18,11 @@ model User {
   email String  @unique
   name  String?
 }
+
+model Product {
+  id          Int    @id @default(autoincrement())
+  name        Json
+  description Json
+  price       Float
+  defaultLang String @default("en")
+}
