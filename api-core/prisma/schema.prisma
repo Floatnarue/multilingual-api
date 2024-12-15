@@ -13,16 +13,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+model Product {
+  id          String @id @default(dbgenerated("gen_random_uuid()"))
+  // for defualt langauge => decrease unnecessary nested query ex. "english"
+  name        String
+  description String
+
+  Translation Translation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Product {
-  id          Int    @id @default(autoincrement())
-  name        Json
-  description Json
-  price       Float
-  defaultLang String @default("en")
+model Language {
+  id String @id @default(dbgenerated("gen_random_uuid()"))
+
+  name String
+
+  Translation Translation[]
+}
+
+model Translation {
+  id String @id @default(dbgenerated("gen_random_uuid()"))
+
+  name        String
+  description String
+  slug        String? // for SEO 
+
+  language   Language @relation(fields: [languageId], references: [id])
+  languageId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, languageId])
+  @@index([productId])
+  @@index([languageId])
 }
