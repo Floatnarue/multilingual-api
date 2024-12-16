@@ -5,21 +5,14 @@ import { CreateProductDto, SearchProductDto } from './dto';
 @Controller('product')
 export class ProductController {
     constructor(private readonly productService: ProductService) { }
-
+    // Validation input Dto using schema-Based Validation with Zod
+    // for more robust validation , we could use Validation pipes to ensure data validation 
+    // before the request enter the controller.
     @Post()
     create(@Body() createUserDto: CreateProductDto) {
         return this.productService.createOne(createUserDto);
     }
     @Get()
-    findAll() {
-        // return this.productService.findAll();
-        return this.productService.findAll();
-    }
-    // @Get(':id')
-    // findOne(@Param('id') id: string) {
-    //     return this.productService.findOne(id);
-    // }
-    @Get('search')
     async searchProducts(@Query() searchDto: SearchProductDto) {
         return this.productService.searchProducts({
             query: searchDto.query,

@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 ;
 
 import { DatabaseService } from 'src/database/database.service';
-import { AddProductTranslationDto, CreateProductDto } from './dto';
+import { AddProductTranslationDto, CreateProductDto, GetProductsWithPagination } from './dto';
 import { LanguageService } from 'src/language/language.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 
 
 @Injectable()
@@ -30,7 +30,7 @@ export class ProductService {
                 }
             }
 
-            return product; // Return the created product
+            return product;
         } catch (error) {
             console.error("Error creating product:", error);
             throw new Error("Cannot create this product");
@@ -79,7 +79,7 @@ export class ProductService {
         query?: string;
         page?: number;
         limit?: number;
-    }) {
+    }): Promise<GetProductsWithPagination> {
         const { query, page = 1, limit = 10 } = params;
 
         const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page;
@@ -87,10 +87,8 @@ export class ProductService {
 
 
         try {
-            // Calculate pagination
-            const skip = (pageNumber - 1) * limitNumber;
 
-            // Construct search condition
+            const skip = (pageNumber - 1) * limitNumber;
             const searchCondition: Prisma.ProductWhereInput = query
                 ? {
                     OR: [
@@ -109,8 +107,7 @@ export class ProductService {
                 }
                 : {};
 
-            console.log('searchCondition', searchCondition)
-            // Fetch products with translations
+
             const products = await this.database.product.findMany({
                 where: searchCondition,
                 include: {
@@ -122,7 +119,6 @@ export class ProductService {
                     createdAt: 'desc'
                 }
             });
-
 
             console.log('products', products)
 
@@ -145,9 +141,6 @@ export class ProductService {
         }
     }
 
-    async findAll() {
-        return await this.database.product.findMany({})
-    }
 
     async findOne(id: string) {
         try {
@@ -166,7 +159,7 @@ export class ProductService {
         }
     }
 
-    async deleteOne(id: string) {
+    async deleteOne(id: string): Promise<Product> {
         try {
             const product = await this.database.product.findUnique({
                 where: {

@@ -15,6 +15,66 @@ Answer :
 
 Answer :
 
+According to the project manager's requirements, I will design software performace testing by general best practices (Im not expert or experienced in this testing field so I will use my conceptual understanding to design the testing strategy , wish to learn more soon too :> )
+
+=> Create a staging environment that mirrors production
+
+1.Load Testing
+
+- Simulate expected concurrent user loads
+- Gradually increase load to identify system breaking points
+- Test with 50%, 100%, and 150% of expected peak load
+
+recommend scenarios :
+
+- 100 concurrent users
+- Mix of read and write operations
+- Verify response times < 200ms (for example)
+
+  2.Stress Testing
+
+- Determine system's recovery capabilities
+- Identify potential bottlenecks and failure modes
+
+recommend scenarios :
+
+- 500 concurrent users
+- Simulate Black Friday/high traffic event
+- Verify system remains responsive
+
+  3.Endurance Testing
+
+- Verify system stability over prolonged periods
+
+recommended scenarios :
+
+- Measure latency of multi-service data fetch
+
+---
+
+3. Design and develop two APIs using NestJS and Postgres with the following
+   specifications:
+
+Additional Requirements:
+• Validation: Outline how you will validate data inputs in both APIs to ensure data
+integrity.
+
+Answer : In this api ,i used schema-based validation with zod lib to ensure data input and output at the controller and service level. which I could make it more robust by implementing validation pipes before the request enter the controller.
+
+---
+
+• Database Design: Describe the database schema and the approach you will use to
+handle multilingual support for product information.
+
+Answer : after consideration various approaches , i choose to use translation schema to handle multilingual data which consist of 1.Translation table 2.Language table , the purpose of these two tables is 1.store data in difference language in Translation table and seperate the data from the product table and make it more flexible / scalable(no need migration plan when new language added), further more , i store product name and description in the default language (e.g. english) to make it faster in read operation and decrease unnecessary nested query.
+
+---
+
+• Testing Strategy: Explain your strategy for testing these APIs, including how you
+will handle unit tests, integration tests, and any end-to-end testing considerations.
+
+---
+
 ### React Questions
 
 1. useCallback ใช้ทําอะไร
@@ -30,22 +90,20 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import UserProfile from './UserProfile';
 
-// Mock the global fetch function
 global.fetch = jest.fn();
 
 describe('UserProfile Component', () => {
 const mockUser = {
-name: 'John Doe',
-email: 'john.doe@example.com'
+name: 'Float dev',
+email: 'float.dev@example.com'
 };
 
 beforeEach(() => {
-// Clear all mocks before each test
+// clear all mocks before each test
 fetch.mockClear();
 });
 
-test('renders loading state initially', () => {
-// Create a pending promise to simulate ongoing fetch
+test('initial render', () => {
 const pendingPromise = new Promise(() => {});
 fetch.mockImplementation(() => pendingPromise);
 
