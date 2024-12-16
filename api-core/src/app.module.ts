@@ -8,7 +8,7 @@ import { LanguageModule } from './language/language.module';
 
 @Module({
   imports: [DatabaseModule.forRoot(), ProductModule, LanguageModule],
-  controllers: [AppController],
-  providers: [AppService],
+  // controllers: [AppController],
+  // providers: [AppService],
 })
 export class AppModule { }

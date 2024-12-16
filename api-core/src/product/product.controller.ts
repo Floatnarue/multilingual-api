@@ -13,12 +13,12 @@ export class ProductController {
     @Get()
     findAll() {
         // return this.productService.findAll();
+        return this.productService.findAll();
     }
-
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.productService.findOne(id);
-    }
+    // @Get(':id')
+    // findOne(@Param('id') id: string) {
+    //     return this.productService.findOne(id);
+    // }
     @Get('search')
     async searchProducts(@Query() searchDto: SearchProductDto) {
         return this.productService.searchProducts({

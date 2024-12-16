@@ -19,13 +19,21 @@ export class ProductService {
                     name: payload.name,
                     description: payload.description,
                 },
-            })
-            if (payload.translation || payload.translation.length > 0) {
-                await this.addProductTranslation(product.id, payload)
+            });
+
+            // Handle translation logic
+            if (payload.translation && payload.translation.length > 0) {
+                try {
+                    await this.addProductTranslation(product.id, payload);
+                } catch (error) {
+                    console.error("Error adding product translations:", error);
+                }
             }
-        }
-        catch (error) {
-            throw new Error("Cannot create this product")
+
+            return product; // Return the created product
+        } catch (error) {
+            console.error("Error creating product:", error);
+            throw new Error("Cannot create this product");
         }
     }
 
@@ -43,15 +51,12 @@ export class ProductService {
         const { translation } = payload
 
         try {
-
-
             const translationResults = await Promise.all(
                 translation.map(async (trans) => {
                     const language = await this.language.findOne(trans.languageId);
                     if (!language) {
                         throw new Error(`Language with ID ${trans.languageId} not found`);
                     }
-
                     return this.database.translation.create({
                         data: {
                             name: trans.name,
@@ -62,7 +67,6 @@ export class ProductService {
                     });
                 })
             );
-
             return translationResults
 
         }
@@ -78,9 +82,13 @@ export class ProductService {
     }) {
         const { query, page = 1, limit = 10 } = params;
 
+        const pageNumber = typeof page === 'string' ? parseInt(page, 10) : page;
+        const limitNumber = typeof limit === 'string' ? parseInt(limit, 10) : limit;
+
+
         try {
             // Calculate pagination
-            const skip = (page - 1) * limit;
+            const skip = (pageNumber - 1) * limitNumber;
 
             // Construct search condition
             const searchCondition: Prisma.ProductWhereInput = query
@@ -101,6 +109,7 @@ export class ProductService {
                 }
                 : {};
 
+            console.log('searchCondition', searchCondition)
             // Fetch products with translations
             const products = await this.database.product.findMany({
                 where: searchCondition,
@@ -108,11 +117,14 @@ export class ProductService {
                     Translation: true
                 },
                 skip,
-                take: limit,
+                take: limitNumber,
                 orderBy: {
                     createdAt: 'desc'
                 }
             });
+
+
+            console.log('products', products)
 
             // Count total matching products
             const total = await this.database.product.count({
@@ -125,7 +137,7 @@ export class ProductService {
                     page,
                     limit,
                     total,
-                    totalPages: Math.ceil(total / limit)
+                    totalPages: Math.ceil(total / limitNumber)
                 }
             };
         } catch (error) {
@@ -134,7 +146,7 @@ export class ProductService {
     }
 
     async findAll() {
-
+        return await this.database.product.findMany({})
     }
 
     async findOne(id: string) {
